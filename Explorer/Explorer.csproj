@@ -93,5 +93,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QueryRetrieveService\QueryRetrieveService.csproj">
+      <Project>{E7730059-785C-41C6-9C01-ADAE92F7D0EC}</Project>
+      <Name>QueryRetrieveService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
