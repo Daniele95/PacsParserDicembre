@@ -15,7 +15,7 @@ namespace PacsParserDicembre
     static class XmlTools
     {
 
-        public static QueryObject readDownloadedXml(string path, QueryObject downloadedFile)
+        public static QueryObject readDownloadedXml(string path, QueryObject downloadedFile,string option)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(path);
@@ -26,7 +26,8 @@ namespace PacsParserDicembre
 
             foreach (string dicomTagName in queryKeys)
             {
-                string result = findTag(doc, dicomTagName);
+                string result = findTag(doc, dicomTagName,option);
+
                 result = result.Replace(' ', '_').Replace("/", "-").Replace("\"", "-");
                 newFile.SetField(dicomTagName, result);
             }
@@ -35,11 +36,16 @@ namespace PacsParserDicembre
             return newFile;
         }
 
-        public static string findTag(XmlDocument doc, string dicomTagName)
+        public static string findTag(XmlDocument doc, string dicomTagName,string option)
         {
-
             XmlNodeList xnList;
-            xnList = doc.SelectNodes("/data-set/element[@name='" + dicomTagName + "']");
+            string stringBefore = "";
+            if (option == "find")
+                stringBefore = "/data-set/element[@name='";
+            if (option == "download")
+                stringBefore = "/file-format/data-set/element[@name='";
+
+            xnList = doc.SelectNodes(stringBefore + dicomTagName + "']");
             string result = "";
             if (xnList.Count > 0)
                 result = xnList[0].InnerText;

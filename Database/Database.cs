@@ -17,7 +17,6 @@ namespace Database
         public string SeriesInstanceUID { get; set; } = "";
         public string SeriesDescription { get; set; } = "";
         public string InstanceNumber { get; set; } = "";
-        public string FileStoragePath { get; set; } = "";
     }
 
 

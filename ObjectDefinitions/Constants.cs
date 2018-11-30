@@ -12,6 +12,9 @@ namespace PacsParserDicembre
 
         public static bool Verbose = true;
 
-        public static string database = @"C:\Users\daniele\Desktop\DATABASE";
+        public static string database = @"C:\Users\daniele\Desktop\DATABASE\";
+
+
+        public static string listenerFolder = @"C:\Users\daniele\Lavoro\Dicom\Listener\downloads\";
     }
 }

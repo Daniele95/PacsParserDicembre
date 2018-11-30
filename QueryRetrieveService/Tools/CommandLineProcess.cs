@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PacsParserDicembre.Tools
 {
@@ -36,6 +37,7 @@ namespace PacsParserDicembre.Tools
         {
             proc.Start();
 
+
             Thread thread = new Thread(new ThreadStart(logOutput));
             thread.Start();
         }
@@ -46,8 +48,10 @@ namespace PacsParserDicembre.Tools
             {
                 string line = proc.StandardOutput.ReadLine();
                 if (Constants.Verbose) Console.WriteLine(line);
-                if (line.Contains("(Success)"))
+                if (line.Contains("Success"))
+                {
                     RaiseEvent(new StudyLevelQuery());
+                }
             }
 
         }

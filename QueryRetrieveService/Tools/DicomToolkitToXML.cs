@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PacsParserDicembre.Tools
 {
     class DicomToolkitToXML : Publisher
     {
         string[] queryString;
-        public CommandLineProcess ComandLineTool;
+        public CommandLineProcess ComandLineTool = new CommandLineProcess();
         string path;
         static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
 
@@ -22,16 +23,9 @@ namespace PacsParserDicembre.Tools
             string arguments = " " + path + " " + path + ".xml";
             string[]  comand = { "dcm2xml", arguments };
             queryString = comand;
-            ComandLineTool.Event += onConverted;
-            ComandLineTool = new CommandLineProcess();
             ComandLineTool.configureProcess(queryString);
         }
-
-        private void onConverted(QueryObject obj)
-        {
-            QueryObject downloadFileInfo = XmlTools.readDownloadedXml(path, new DownloadedFileInfo());
-            RaiseEvent(downloadFileInfo);
-        }
+        
 
 
         public void start()

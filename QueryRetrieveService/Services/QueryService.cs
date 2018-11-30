@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PacsParserDicembre.Tools;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace PacsParserDicembre
 
             foreach (FileInfo file in Files)
             {
-                QueryObject study = XmlTools.readDownloadedXml(dir + file.Name, obj);
+                QueryObject study = XmlTools.readDownloadedXml(dir + file.Name, obj,"find");
                 queryResults.Add(study);
             }
 

@@ -18,12 +18,17 @@ namespace DataHandlerTools
     {
         static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
         static ManualResetEvent eachFileWait = new ManualResetEvent(false);
+        QueryObject obj;
         QueryObject downloadedFile; //currently downloaded
 
-
-        public void LaunchQuery(string dir, QueryObject obj)
+        public DownloadManager(QueryObject obj)
         {
-            DicomToolkitDownload t = new DicomToolkitDownload(obj, dir);
+            this.obj = obj;
+        }
+
+        public void LaunchQuery()
+        {
+            DicomToolkitDownload t = new DicomToolkitDownload(obj);
             t.Event += onProcessEnd;
 
             t.launchProcess();
@@ -31,29 +36,23 @@ namespace DataHandlerTools
             manualResetEvent.WaitOne();
 
             // now parse dicom files
-            DirectoryInfo d = new DirectoryInfo(dir);
-            FileInfo[] Files = d.GetFiles();
+            var allFiles = Directory.GetFiles(Constants.listenerFolder);
+            var filesToExclude = Directory.GetFiles(Constants.listenerFolder,"*.xml");
+            var Files = allFiles.Except(filesToExclude);
 
-            foreach (FileInfo file in Files)
+            foreach (string fileName in Files)
             {
-                DicomToolkitToXML toXml = new DicomToolkitToXML(file.FullName);
-                toXml.Event += onConverted;
+                DicomToolkitToXML toXml = new DicomToolkitToXML(fileName);
                 toXml.start();
+                Thread.Sleep(2);
+                QueryObject downloadFileInfo = XmlTools.readDownloadedXml(fileName + ".xml", new DownloadedFileInfo(),"download");
 
-                eachFileWait.Reset();
-                eachFileWait.WaitOne();
-
-                storeInDatabase(file.FullName);
+                MessageBox.Show("ecco " + downloadFileInfo.GetField("SeriesInstanceUID"));
+                storeInDatabase(fileName, downloadFileInfo);
             }
         }
-        private void onConverted (QueryObject downloadedFile)
-        {
-            this.downloadedFile = downloadedFile;
-            eachFileWait.Set();
 
-        }
-
-        private void storeInDatabase(string fullPath)
+        private void storeInDatabase(string filePath, QueryObject downloadedFile)
         {
             // store into database
 
@@ -62,8 +61,6 @@ namespace DataHandlerTools
 
             string fileStoragePath = folderStoragePath + "/" + downloadedFile.GetField("InstanceNumber") + ".dcm";
             downloadedFile.SetField("FileStoragePath", fileStoragePath);
-
-            string filePath = fullPath.Substring(0, fullPath.Length - 4); //whithout extension .xml
             if (!File.Exists(fileStoragePath))
             {
                 try
