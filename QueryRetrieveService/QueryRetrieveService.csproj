@@ -42,11 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\DownloadManager.cs" />
-    <Compile Include="Tools\DicomToolkitToXML.cs" />
     <Compile Include="Tools\DicomToolkitDownload.cs" />
     <Compile Include="Tools\DicomToolkitQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\QueryService.cs" />
+    <Compile Include="Tools\DicomToolkitToXML.cs" />
+    <Compile Include="Tools\CommandLineProcess.cs" />
     <Compile Include="Tools\XmlTools.cs" />
   </ItemGroup>
   <ItemGroup>

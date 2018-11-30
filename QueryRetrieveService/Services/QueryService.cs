@@ -12,15 +12,11 @@ namespace PacsParserDicembre
 {
     public class QueryService : Publisher
     {
-        static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+        static ManualResetEvent manualResetEvent = new ManualResetEvent(false);        
 
-        public QueryService()
+        public List<QueryObject> LaunchQuery(string dir, QueryObject obj)
         {
-        }
-
-        public List<QueryObject> LaunchQuery(string dir, QueryObject obj,string service)
-        {
-            DicomToolkitQuery t = new DicomToolkitQuery(obj, dir, service);
+            DicomToolkitQuery t = new DicomToolkitQuery(obj, dir);
             t.Event += onProcessEnd;
             t.launchProcess();
 

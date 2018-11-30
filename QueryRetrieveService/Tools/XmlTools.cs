@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PacsParserDicembre.Tools;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,14 +20,14 @@ namespace PacsParserDicembre
             XmlDocument doc = new XmlDocument();
             doc.Load(path);
 
-            QueryObject newFile = (QueryObject)Activator.CreateInstance(downloadedFile.GetType());
-            
+            QueryObject newFile = (QueryObject)Activator.CreateInstance(downloadedFile.GetType());    
 
             List<string> queryKeys = newFile.getKeys();
 
             foreach (string dicomTagName in queryKeys)
             {
                 string result = findTag(doc, dicomTagName);
+                result = result.Replace(' ', '_').Replace("/", "-").Replace("\"", "-");
                 newFile.SetField(dicomTagName, result);
             }
 
@@ -34,7 +35,7 @@ namespace PacsParserDicembre
             return newFile;
         }
 
-        static string findTag(XmlDocument doc, string dicomTagName)
+        public static string findTag(XmlDocument doc, string dicomTagName)
         {
 
             XmlNodeList xnList;
@@ -44,7 +45,6 @@ namespace PacsParserDicembre
                 result = xnList[0].InnerText;
             return result;
         }
-
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Database;
-using LiteDB;
 using PacsParserDicembre;
+using PacsParserDicembre.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,106 +14,79 @@ using System.Xml;
 namespace DataHandlerTools
 {
 
-
     public class DownloadManager
     {
+        static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+        static ManualResetEvent eachFileWait = new ManualResetEvent(false);
+        QueryObject downloadedFile; //currently downloaded
 
-        public DownloadManager(string fullPath)
+
+        public void LaunchQuery(string dir, QueryObject obj)
         {
-
-        }
-
-
-        public void onCreated(object o, FileSystemEventArgs e)
-        {
-
-            //  queryTools.IsFileClosed(e.FullPath, true);
-            string[] splitted = e.FullPath.Split('.');
-            string extension = splitted[splitted.Length - 1];
-            if (extension == "part")
-            {
-                string filePath = e.FullPath.Substring(0, e.FullPath.Length - 5); //whithout extension .part
-                while (!File.Exists(filePath)) { }
-                dicom2xml(filePath);
-            }
-            else // if xml: read it  and store \and store info into database
-            {
-                DownloadedFileInfo downloadedFile = readDownloadedXml(e.FullPath);
-
-                string folderStoragePath = Constants.database + "files/" + downloadedFile.PatientName + "/" + downloadedFile.StudyDescription + "/" + downloadedFile.SeriesDescription;
-                System.IO.Directory.CreateDirectory(folderStoragePath);
-
-                string fileStoragePath = folderStoragePath + "/" + downloadedFile.InstanceNumber + ".dcm";
-                downloadedFile.FileStoragePath = fileStoragePath;
-                string filePath = e.FullPath.Substring(0, e.FullPath.Length - 4); //whithout extension .xml
-                if (!File.Exists(fileStoragePath))
-                {
-                    try
-                    {
-                        File.Move(filePath, fileStoragePath);
-                        database.Add(downloadedFile);
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show(exc.ToString());
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("file already present in database ");
-                }
-                File.Delete(filePath);
-
-            }
-        }
-
-        public void onSeriesButtonPressed(SeriesLevelQuery queryResults)
-        {
-
-            DicomToolkitQuery t = new DicomToolkitQuery(queryResults, dir, service);
+            DicomToolkitDownload t = new DicomToolkitDownload(obj, dir);
             t.Event += onProcessEnd;
-            t.launchProcess();
 
+            t.launchProcess();
             manualResetEvent.Reset();
             manualResetEvent.WaitOne();
-        }
 
-        public static void dicom2xml(string path)
-        {
-            string arguments = " " + path + " " + path + ".xml";
-            queryTools.initProcess("dcm2xml", arguments);
-        }
+            // now parse dicom files
+            DirectoryInfo d = new DirectoryInfo(dir);
+            FileInfo[] Files = d.GetFiles();
 
-        public static DownloadedFileInfo readDownloadedXml(string path)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(path);
-            DownloadedFileInfo downloadedFile = new DownloadedFileInfo();
-            foreach (string dicomTag in downloadedFile.getKeys())
+            foreach (FileInfo file in Files)
             {
-                if (dicomTag != "FileStoragePath")
+                DicomToolkitToXML toXml = new DicomToolkitToXML(file.FullName);
+                toXml.Event += onConverted;
+                toXml.start();
+
+                eachFileWait.Reset();
+                eachFileWait.WaitOne();
+
+                storeInDatabase(file.FullName);
+            }
+        }
+        private void onConverted (QueryObject downloadedFile)
+        {
+            this.downloadedFile = downloadedFile;
+            eachFileWait.Set();
+
+        }
+
+        private void storeInDatabase(string fullPath)
+        {
+            // store into database
+
+            string folderStoragePath = Constants.database + "files/" + downloadedFile.GetField("PatientName") + " / " + downloadedFile.GetField("StudyDescription") + " / " + downloadedFile.GetField("SeriesDescription");
+            System.IO.Directory.CreateDirectory(folderStoragePath);
+
+            string fileStoragePath = folderStoragePath + "/" + downloadedFile.GetField("InstanceNumber") + ".dcm";
+            downloadedFile.SetField("FileStoragePath", fileStoragePath);
+
+            string filePath = fullPath.Substring(0, fullPath.Length - 4); //whithout extension .xml
+            if (!File.Exists(fileStoragePath))
+            {
+                try
                 {
-                    string myTag = findTag(doc, dicomTag);
-                    myTag = myTag.Replace(' ', '_');
-                    myTag = myTag.Replace("/", "-");
-                    myTag = myTag.Replace("\"", "-");
-                    downloadedFile.SetField(dicomTag, myTag);
+                    File.Move(filePath, fileStoragePath);
+                    database.Add(downloadedFile);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.ToString());
                 }
             }
-            File.Delete(path);
-            return downloadedFile;
+            else
+            {
+                MessageBox.Show("file already present in database ");
+            }
+            File.Delete(filePath);
         }
 
 
-        static string findTag(XmlDocument doc, string dicomTagName)
+        private void onProcessEnd(QueryObject s)
         {
-
-            XmlNodeList xnList;
-            xnList = doc.SelectNodes("/file-format/data-set/element[@name='" + dicomTagName + "']");
-            string result = "";
-            if (xnList.Count > 0)
-                result = xnList[0].InnerText;
-            return result;
+            manualResetEvent.Set();
         }
 
     }

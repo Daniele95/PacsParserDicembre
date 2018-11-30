@@ -8,12 +8,14 @@ namespace PacsParserDicembre.Tools
 {
     class DicomToolkitDownload : DicomToolkitQuery
     {
-        
-            if (service == "move")
-            {
-                fullQuery = " -aem USER  -aec MIOSERVER " + query + " localhost 11112";
-                queryString[0] = "movescu";
-            }
+        public DicomToolkitDownload(QueryObject queryData, string dir) : base(queryData, dir) { }
 
-}
+        new string [] specificQuery(string mainQuery, string dir)
+        {
+             string fullQuery = " -aem USER  -aec MIOSERVER " + mainQuery + " localhost 11112";
+            string[] queryString = { "movescu", fullQuery };
+            return queryString;
+        }
+
+    }
 }
