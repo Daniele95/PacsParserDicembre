@@ -44,8 +44,9 @@ namespace DataHandlerTools
             {
                 DicomToolkitToXML toXml = new DicomToolkitToXML(fileName);
                 toXml.start();
-                Thread.Sleep(2);
+                Thread.Sleep(50);
                 QueryObject downloadFileInfo = XmlTools.readDownloadedXml(fileName + ".xml", new DownloadedFileInfo(),"download");
+                File.Delete(fileName + ".xml");
 
                 MessageBox.Show("ecco " + downloadFileInfo.GetField("SeriesInstanceUID"));
                 storeInDatabase(fileName, downloadFileInfo);

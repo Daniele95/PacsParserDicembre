@@ -18,20 +18,24 @@ namespace PacsParserDicembre
         public static QueryObject readDownloadedXml(string path, QueryObject downloadedFile,string option)
         {
             XmlDocument doc = new XmlDocument();
-            doc.Load(path);
-
-            QueryObject newFile = (QueryObject)Activator.CreateInstance(downloadedFile.GetType());    
-
+            QueryObject newFile = (QueryObject)Activator.CreateInstance(downloadedFile.GetType());
             List<string> queryKeys = newFile.getKeys();
 
-            foreach (string dicomTagName in queryKeys)
+            try
             {
-                string result = findTag(doc, dicomTagName,option);
+                doc.Load(path);
 
-                result = result.Replace(' ', '_').Replace("/", "-").Replace("\"", "-");
-                newFile.SetField(dicomTagName, result);
+                foreach (string dicomTagName in queryKeys)
+                {
+                    string result = findTag(doc, dicomTagName, option);
+
+                    result = result.Replace(' ', '_').Replace("/", "-").Replace("\"", "-");
+                    newFile.SetField(dicomTagName, result);
+                }
+            } catch(Exception)
+            {
+                MessageBox.Show("Impossibile accedere al file " + path + ", ancora in scrittura");
             }
-
 
             return newFile;
         }
