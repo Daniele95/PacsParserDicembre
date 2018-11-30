@@ -13,7 +13,9 @@ namespace PacsParserDicembre.Tools
 
         public override string[] specificQuery(string mainQuery,string dir)
         {
-            string fullQuery = " -aem USER  -aec MIOSERVER " + mainQuery + " localhost 11112";
+            string fullQuery = " -aem "+ Constants.MyAEListening + " -aec "+ 
+                Constants.AECalled+" "  + mainQuery + " "+ Constants.serverIp +" "+ Constants.serverPort;
+
             string[] queryString = { "movescu", fullQuery };
             return queryString;
         }

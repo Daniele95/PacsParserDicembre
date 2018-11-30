@@ -9,16 +9,13 @@ namespace PacsParserDicembre.Tools
 {
     class DicomToolkitQuery : DicomToolkitAbstractQuery
     {
-        public DicomToolkitQuery(QueryObject queryData,string dir) : base(queryData, dir) {
-
-            MessageBox.Show("caioo");
-        }
+        public DicomToolkitQuery(QueryObject queryData,string dir) : base(queryData, dir) {}
 
         public override string[] specificQuery(string mainQuery, string dir)
         {
-            string fullQuery = " -S  -aec MIOSERVER " + mainQuery + " localhost 11112  -od " + dir + " --extract-xml ";
+            string fullQuery = " -S  -aec "+ Constants.AECalled+" " + mainQuery + " "+
+                Constants.serverIp+" " +Constants.serverPort+"  -od " + dir + " --extract-xml ";
             string[] queryString = { "findscu", fullQuery };
-            MessageBox.Show(fullQuery);
             return queryString;
         }
     }

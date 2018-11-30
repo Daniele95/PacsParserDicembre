@@ -41,13 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExplorerLogic.cs" />
     <Compile Include="Services\DownloadManager.cs" />
     <Compile Include="Tools\DicomToolkitQuery.cs" />
     <Compile Include="Tools\DicomToolkitDownload.cs" />
     <Compile Include="Tools\DicomToolkitAbstractQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\QueryService.cs" />
-    <Compile Include="Tools\DicomToolkitToXML.cs" />
     <Compile Include="Tools\CommandLineProcess.cs" />
     <Compile Include="Tools\XmlTools.cs" />
   </ItemGroup>

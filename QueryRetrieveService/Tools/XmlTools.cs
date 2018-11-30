@@ -29,7 +29,7 @@ namespace PacsParserDicembre
                 {
                     string result = findTag(doc, dicomTagName, option);
 
-                    result = result.Replace(' ', '_').Replace("/", "-").Replace("\"", "-");
+                    result = result.Replace("/", "-").Replace(' ', '_').Replace("\"", "-");
                     newFile.SetField(dicomTagName, result);
                 }
             } catch(Exception)

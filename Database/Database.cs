@@ -23,9 +23,9 @@ namespace Database
     public static class database
     {
 
-        public static void Add(QueryObject aDownloadedFile)
+        public static void Add(QueryObject aDownloadedFile,string databaseFolder)
         {
-            using (var db = new LiteDatabase(Constants.database + "database.db"))
+            using (var db = new LiteDatabase(databaseFolder + "database.db"))
             {
                 var downloadedFiles = db.GetCollection<QueryObject>("downloadedFiles");
                 downloadedFiles.Insert(aDownloadedFile);

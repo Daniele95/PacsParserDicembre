@@ -26,7 +26,7 @@ namespace DataHandlerTools
             this.obj = obj;
         }
 
-        public void LaunchQuery()
+        public List<string> LaunchQuery()
         {
             DicomToolkitDownload t = new DicomToolkitDownload(obj);
             t.Event += onProcessEnd;
@@ -40,34 +40,38 @@ namespace DataHandlerTools
             var filesToExclude = Directory.GetFiles(Constants.listenerFolder,"*.xml");
             var Files = allFiles.Except(filesToExclude);
 
+            List<string> destinations = new List<string>();
+
             foreach (string fileName in Files)
             {
-                DicomToolkitToXML toXml = new DicomToolkitToXML(fileName);
-                toXml.start();
-                Thread.Sleep(50);
+                DicomConvert.ToXml(fileName);
+
                 QueryObject downloadFileInfo = XmlTools.readDownloadedXml(fileName + ".xml", new DownloadedFileInfo(),"download");
                 File.Delete(fileName + ".xml");
 
-                MessageBox.Show("ecco " + downloadFileInfo.GetField("SeriesInstanceUID"));
-                storeInDatabase(fileName, downloadFileInfo);
+                string folderStoragePath = storeInDatabase(fileName, downloadFileInfo);
+                destinations.Add(folderStoragePath);
             }
+            return destinations;
         }
 
-        private void storeInDatabase(string filePath, QueryObject downloadedFile)
+        private string storeInDatabase(string filePath, QueryObject downloadedFile)
         {
             // store into database
 
-            string folderStoragePath = Constants.database + "files/" + downloadedFile.GetField("PatientName") + " / " + downloadedFile.GetField("StudyDescription") + " / " + downloadedFile.GetField("SeriesDescription");
+            string folderStoragePath = Constants.database + "files/" + downloadedFile.GetField("PatientName") + "/" + downloadedFile.GetField("StudyDescription") + "/" + downloadedFile.GetField("SeriesDescription")+"/";
             System.IO.Directory.CreateDirectory(folderStoragePath);
 
             string fileStoragePath = folderStoragePath + "/" + downloadedFile.GetField("InstanceNumber") + ".dcm";
+
             downloadedFile.SetField("FileStoragePath", fileStoragePath);
+
             if (!File.Exists(fileStoragePath))
             {
                 try
                 {
                     File.Move(filePath, fileStoragePath);
-                    database.Add(downloadedFile);
+                    database.Add(downloadedFile, Constants.database);
                 }
                 catch (Exception exc)
                 {
@@ -79,6 +83,8 @@ namespace DataHandlerTools
                 MessageBox.Show("file already present in database ");
             }
             File.Delete(filePath);
+
+            return folderStoragePath+ downloadedFile.GetField("InstanceNumber");
         }
 
 

@@ -10,6 +10,34 @@ using System.Windows;
 namespace PacsParserDicembre.Tools
 {
 
+    static class DicomConvert
+    {
+        public static void ToXml(string fileName)
+        {
+            string arguments = " " + fileName + " " + fileName + ".xml";
+            StaticCommandLineProcess.Start("dcm2xml", arguments);
+            Thread.Sleep(50);
+        }
+        public static void ToJpg(string fileName)
+        {
+            string arguments = " " + fileName + ".dcm " + fileName + ".jpeg";
+            StaticCommandLineProcess.Start("toJpg/dcmcjpeg", arguments);
+            Thread.Sleep(50);
+        }
+
+    }
+
+    static class StaticCommandLineProcess
+    {
+        public static void Start(string process, string arguments)
+        {
+            CommandLineProcess c = new CommandLineProcess();
+            string[] queryString = { process, arguments };
+            c.configureProcess(queryString);
+            c.launchProcess();
+        }
+    }
+
     class CommandLineProcess : Publisher
     {
         public Process proc;
