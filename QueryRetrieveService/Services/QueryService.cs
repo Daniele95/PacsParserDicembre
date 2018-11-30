@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,9 +18,9 @@ namespace PacsParserDicembre
         {
         }
 
-        public List<QueryObject> LaunchQuery(string dir, StudyLevelQuery obj)
+        public List<QueryObject> LaunchQuery(string dir, QueryObject obj,string service)
         {
-            LaunchDicomToolkit t = new LaunchDicomToolkit(obj, dir);
+            DicomToolkitQuery t = new DicomToolkitQuery(obj, dir, service);
             t.Event += onProcessEnd;
             t.launchProcess();
 
@@ -30,10 +31,10 @@ namespace PacsParserDicembre
             DirectoryInfo d = new DirectoryInfo(dir);
             FileInfo[] Files = d.GetFiles("*.xml");
             List<QueryObject> queryResults = new List<QueryObject>();
-            QueryObject study = new StudyLevelQuery();
+
             foreach (FileInfo file in Files)
             {
-                study = XmlTools.readDownloadedXml(dir + file.Name, obj);
+                QueryObject study = XmlTools.readDownloadedXml(dir + file.Name, obj);
                 queryResults.Add(study);
             }
 

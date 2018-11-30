@@ -41,12 +41,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Tools\LaunchDicomToolkit.cs" />
-    <Compile Include="Query.cs" />
+    <Compile Include="Services\DownloadManager.cs" />
+    <Compile Include="Tools\DicomToolkitToXML.cs" />
+    <Compile Include="Tools\DicomToolkitDownload.cs" />
+    <Compile Include="Tools\DicomToolkitQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryService.cs" />
+    <Compile Include="Services\QueryService.cs" />
     <Compile Include="Tools\XmlTools.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Database\Database.csproj">
+      <Project>{e5f23a85-748e-498e-8e98-f4f97b05b57e}</Project>
+      <Name>Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjectDefinitions\ObjectDefinitions.csproj">
+      <Project>{56805f88-1c3d-4965-a041-bb8316c8ff62}</Project>
+      <Name>ObjectDefinitions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

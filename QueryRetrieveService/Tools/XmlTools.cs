@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,17 +14,24 @@ namespace PacsParserDicembre
     static class XmlTools
     {
 
-        public static QueryObject readDownloadedXml(string path, StudyLevelQuery downloadedFile)
+        public static QueryObject readDownloadedXml(string path, QueryObject downloadedFile)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(path);
-            StudyLevelQuery newFile = new StudyLevelQuery();
 
-                newFile.SetField("PatientName", findTag(doc, "PatientName"));
-                newFile.SetField("StudyDescription", findTag(doc, "StudyDescription"));
-                newFile.SetField("SeriesDescription", findTag(doc, "SeriesDescription"));
+            QueryObject newFile = (QueryObject)Activator.CreateInstance(downloadedFile.GetType());
+            
 
-                return newFile;
+            List<string> queryKeys = newFile.getKeys();
+
+            foreach (string dicomTagName in queryKeys)
+            {
+                string result = findTag(doc, dicomTagName);
+                newFile.SetField(dicomTagName, result);
+            }
+
+
+            return newFile;
         }
 
         static string findTag(XmlDocument doc, string dicomTagName)

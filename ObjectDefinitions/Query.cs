@@ -9,7 +9,36 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace PacsParserDicembre
-{    
+{
+
+    public class ImageLevelQuery : QueryObject
+    {
+        public string QueryRetrieveLevel { get; set; } = "IMAGE";
+        public string StudyInstanceUID { get; set; } = "";
+        public string SeriesInstanceUID { get; set; } = "";
+        public string InstanceNumber { get; set; } = "";
+    }
+
+        public class SeriesLevelQuery : QueryObject
+    {
+        public string QueryRetrieveLevel { get; set; } = "SERIES";
+        public string StudyInstanceUID { get; set; } = "";
+        public string SeriesInstanceUID { get; set; } = "";
+        public string SeriesDescription { get; set; } = "";
+        public string PatientID { get; set; } = "";
+
+
+        public SeriesLevelQuery() : base()
+        { }
+
+        public SeriesLevelQuery(StudyLevelQuery studyQuery) : base()
+        {
+            SetField("StudyInstanceUID", studyQuery.GetField("StudyInstanceUID"));
+            SetField("PatientID", studyQuery.GetField("PatientID"));
+        }
+
+    }
+
     public class StudyLevelQuery : QueryObject
     {
         public string QueryRetrieveLevel { get; set; } = "STUDY";
@@ -47,7 +76,7 @@ namespace PacsParserDicembre
             return new List<string>(queryData.Keys);
         }
 
-        public string getValueByTag(string tag)
+        public string GetField(string tag)
         {
             return queryData[tag];
         }

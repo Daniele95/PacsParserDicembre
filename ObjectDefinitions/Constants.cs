@@ -11,5 +11,7 @@ namespace PacsParserDicembre
         public static string DicomToolkit = @"C:\Users\daniele\Documents\Visual Studio 2017\Projects\PacsParserDicembre\QueryRetrieveService\DicomToolkit\";
 
         public static bool Verbose = true;
+
+        public static string database = @"C:\Users\daniele\Desktop\DATABASE";
     }
 }

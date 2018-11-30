@@ -11,12 +11,13 @@ using System.Xml;
 
 namespace PacsParserDicembre
 {
-    class LaunchDicomToolkit : Publisher
+    class DicomToolkitQuery : Publisher
     {
         public Process proc;
-        public LaunchDicomToolkit(QueryObject queryData, string dir)
+        public DicomToolkitQuery(QueryObject queryData, string dir)
         {
-            configureProcess(queryString(queryData,dir));
+            string[] query = queryString(queryData, dir);
+            configureProcess(query);
         }
 
         // wrapper for Dicom Toolkit services
@@ -24,18 +25,18 @@ namespace PacsParserDicembre
         {
             string query = "";
             foreach (string dicomTag in queryData.getKeys())
-                query = " -k " + dicomTag + "=\"" + queryData.getValueByTag(dicomTag) + "\" " + query;
+                query = " -k " + dicomTag + "=\"" + queryData.GetField(dicomTag) + "\" " + query;
 
 
-            string fullQuery =
-                 " -S  -aec MIOSERVER " + query + " localhost 11112  -od " + dir + " --extract-xml ";
+            string fullQuery = " -S  -aec MIOSERVER " + query + " localhost 11112  -od " + dir + " --extract-xml ";
+            string[] queryString= { "findscu", fullQuery };
+
 
 
             DirectoryInfo di = Directory.CreateDirectory(dir);
             foreach (FileInfo file in di.GetFiles())
                 file.Delete();
-
-            string[] queryString = { "findscu", fullQuery };
+            
             return queryString;
 
         }
@@ -78,5 +79,6 @@ namespace PacsParserDicembre
             }
             
         }
+        
     }
 }
