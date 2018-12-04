@@ -74,6 +74,16 @@ namespace PacsParserDicembre
             init();
         }
 
+
+        public void fill()
+        {
+            PropertyInfo[] properties = this.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                queryData[property.Name]= property.GetValue(this).ToString();
+            }
+        }
+
         void init()
         {
             PropertyInfo[] properties = this.GetType().GetProperties();

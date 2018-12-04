@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PacsParserDicembre;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
 
 namespace Explorer
 {
@@ -37,5 +39,20 @@ namespace Explorer
         {
             mainWindow.onSearchButtonClicked("remote");
         }
+
+        public StudyLevelQuery getQueryFields()
+        {
+            StudyLevelQuery querySettings = new StudyLevelQuery();
+
+            querySettings.SetField("PatientName", PatientNameBox.Text);
+            querySettings.SetField("PatientBirthDate", PatientBirthDatePicker.Text);
+            querySettings.SetField("StudyDate", StudyDatePicker.Text);
+            querySettings.SetField("StudyDescription", StudyDescriptionBox.Text);
+            querySettings.SetField("Modality", ModalityBox.Text);
+
+            return querySettings;
+
+        }
+
     }
 }

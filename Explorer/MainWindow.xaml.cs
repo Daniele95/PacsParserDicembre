@@ -50,25 +50,22 @@ namespace Explorer
             frame.NavigationService.Navigate(downloadPage);
         }
 
+
+
         // ------------------QUERY WINDOW------------------------------
+        
+
 
         public void onSearchButtonClicked(string mode)
         {
             
             queryPage.stackPanel.Children.Clear();
-            StudyLevelQuery querySettings = new StudyLevelQuery();
 
-            querySettings.SetField("PatientName", queryPage.PatientNameBox.Text);
-            querySettings.SetField("PatientBirthDate", queryPage.PatientBirthDatePicker.Text);
-            querySettings.SetField("StudyDate", queryPage.StudyDatePicker.Text);
-            querySettings.SetField("StudyDescription", queryPage.StudyDescriptionBox.Text);
-            querySettings.SetField("Modality", queryPage.ModalityBox.Text);
+            StudyLevelQuery querySettings = queryPage.getQueryFields();
 
+            // search remote
             List<QueryObject> results = new List<QueryObject>();
             if (mode== "remote") results = explorerLogic.searchPatient(querySettings);
-
-            List<DownloadedFileInfo> risultati = new List<DownloadedFileInfo>();
-            if (mode == "local") risultati = database.Get(new DownloadedFileInfo(), Constants.database);
 
             foreach (QueryObject result in results)
             {
@@ -77,9 +74,22 @@ namespace Explorer
                 resultButton.Click += (theSender, eventArgs) => { onStudyButtonClicked(result); };
                 queryPage.stackPanel.Children.Add(resultButton);
             }
-            
-        }
+            // search database
+            DownloadedFileInfo d = new DownloadedFileInfo();
+            d.SetField("PatientName", queryPage.PatientNameBox.Text);
+            List<DownloadedFileInfo> risultati = new List<DownloadedFileInfo>();
+            if (mode == "local") risultati = database.Get(d, Constants.database);
 
+            foreach (DownloadedFileInfo result in risultati)
+            {
+                Button resultButton = new Button();
+                resultButton.Content = result.PatientName.Replace('^', ' ') + "      " + result.StudyDescription.Replace('_', ' ') + "      " + result.StudyDate + "      " + result.Modality;
+                resultButton.Click += (theSender, eventArgs) => {
+                    MessageBox.Show(XmlTools.getStoragePath(result));
+                };
+                queryPage.stackPanel.Children.Add(resultButton);
+            }
+        }
 
 
         // search all series of a study
