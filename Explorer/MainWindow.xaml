@@ -5,19 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Explorer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1000">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="901*"/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="0*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Frame x:Name="frame" Content="Frame" HorizontalAlignment="Left" Height="410" Margin="108,0,0,0" VerticalAlignment="Top" Width="674" Grid.RowSpan="2"/>
-        <StackPanel HorizontalAlignment="Left" Height="420" VerticalAlignment="Top" Width="100" Background="Gray" Grid.RowSpan="2">
+        <Frame  Canvas.ZIndex="3"  x:Name="frame" Content="Frame" HorizontalAlignment="Left" Height="570" Margin="10,0,-1,0" VerticalAlignment="Top" Width="892" Grid.RowSpan="2" Grid.Column="1" Navigated="frame_Navigated" Grid.ColumnSpan="2"/>
+        <StackPanel HorizontalAlignment="Left" Height="570" VerticalAlignment="Top" Width="100" Background="Gray" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Button x:Name="queryButton" Content="Query" Click="queryClick"/>
             <Button x:Name="downloadButton" Content="Download" Click="downloadClick"/>
         </StackPanel>
-        <Button x:Name="button" Content="Search" HorizontalAlignment="Left" Margin="463,30,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="22" Click="onSearchButtonClicked"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="252,29,0,0" Grid.RowSpan="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+
+
+        <ContentControl Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 
     </Grid>
 </Window>

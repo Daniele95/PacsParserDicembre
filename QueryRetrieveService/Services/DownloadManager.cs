@@ -19,14 +19,14 @@ namespace DataHandlerTools
         static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
         static ManualResetEvent eachFileWait = new ManualResetEvent(false);
         QueryObject obj;
-        QueryObject downloadedFile; //currently downloaded
 
         public DownloadManager(QueryObject obj)
         {
             this.obj = obj;
         }
 
-        public List<string> LaunchQuery()
+
+        public List<QueryObject> LaunchQuery(string mode)
         {
             DicomToolkitDownload t = new DicomToolkitDownload(obj);
             t.Event += onProcessEnd;
@@ -40,8 +40,9 @@ namespace DataHandlerTools
             var filesToExclude = Directory.GetFiles(Constants.listenerFolder,"*.xml");
             var Files = allFiles.Except(filesToExclude);
 
-            List<string> destinations = new List<string>();
+            List<QueryObject> downloadedFilesInfo = new List<QueryObject>();
 
+            // iterate on images
             foreach (string fileName in Files)
             {
                 DicomConvert.ToXml(fileName);
@@ -49,20 +50,19 @@ namespace DataHandlerTools
                 QueryObject downloadFileInfo = XmlTools.readDownloadedXml(fileName + ".xml", new DownloadedFileInfo(),"download");
                 File.Delete(fileName + ".xml");
 
-                string folderStoragePath = storeInDatabase(fileName, downloadFileInfo);
-                destinations.Add(folderStoragePath);
+                string folderStoragePath = "";
+                if( mode == "series") folderStoragePath = storeInDatabase(fileName, downloadFileInfo);
+                if( mode =="single") folderStoragePath = fileName;
+
+                downloadedFilesInfo.Add(downloadFileInfo);
             }
-            return destinations;
+            return downloadedFilesInfo;
         }
+
 
         private string storeInDatabase(string filePath, QueryObject downloadedFile)
         {
-            // store into database
-
-            string folderStoragePath = Constants.database + "files/" + downloadedFile.GetField("PatientName") + "/" + downloadedFile.GetField("StudyDescription") + "/" + downloadedFile.GetField("SeriesDescription")+"/";
-            System.IO.Directory.CreateDirectory(folderStoragePath);
-
-            string fileStoragePath = folderStoragePath + "/" + downloadedFile.GetField("InstanceNumber") + ".dcm";
+            string fileStoragePath = XmlTools.getStoragePath(downloadedFile);
 
             downloadedFile.SetField("FileStoragePath", fileStoragePath);
 
@@ -71,7 +71,8 @@ namespace DataHandlerTools
                 try
                 {
                     File.Move(filePath, fileStoragePath);
-                    database.Add(downloadedFile, Constants.database);
+                    database.Add((DownloadedFileInfo)downloadedFile, Constants.database);
+                    MessageBox.Show("File downloaded and stored in "+ fileStoragePath);
                 }
                 catch (Exception exc)
                 {
@@ -84,7 +85,7 @@ namespace DataHandlerTools
             }
             File.Delete(filePath);
 
-            return folderStoragePath+ downloadedFile.GetField("InstanceNumber");
+            return XmlTools.getFolderStoragePath(downloadedFile) + downloadedFile.GetField("InstanceNumber");
         }
 
 

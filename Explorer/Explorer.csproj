@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -108,6 +109,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Database\Database.csproj">
+      <Project>{E5F23A85-748E-498E-8E98-F4F97B05B57E}</Project>
+      <Name>Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ObjectDefinitions\ObjectDefinitions.csproj">
       <Project>{56805f88-1c3d-4965-a041-bb8316c8ff62}</Project>
       <Name>ObjectDefinitions</Name>

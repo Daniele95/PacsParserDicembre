@@ -9,7 +9,22 @@
       Title="QueryPage">
 
     <Grid>
-        <StackPanel Name="stackPanel"  HorizontalAlignment="Left" Height="450" VerticalAlignment="Top" Width="800"/>
-
+        <StackPanel Name="stackPanel"  HorizontalAlignment="Left" Height="191" VerticalAlignment="Top" Width="522" Margin="145,123,0,0"/>
+        <Button x:Name="button" Content="Search remote" HorizontalAlignment="Left" Margin="408,83,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="onRemoteSearchButtonClicked">
+            <Button.Background>
+                <ImageBrush/>
+            </Button.Background>
+        </Button>
+        <TextBox x:Name="PatientNameBox" HorizontalAlignment="Left" Height="23" Margin="31,44,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock x:Name="PatientNameBlock" HorizontalAlignment="Left" Margin="32,10,0,0" TextWrapping="Wrap" Text="Patient's Full Name" VerticalAlignment="Top" Height="22" Width="119"/>
+        <TextBlock x:Name="PatientBirthDateBlock" HorizontalAlignment="Left" Margin="184,10,0,0" TextWrapping="Wrap" Text="Patient's Birth Date" VerticalAlignment="Top" Height="22" Width="120"/>
+        <TextBox x:Name="StudyDescriptionBox" HorizontalAlignment="Left" Height="23" Margin="493,44,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="ModalityBox" HorizontalAlignment="Left" Height="23" Margin="651,44,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock x:Name="StudyDateBlock" HorizontalAlignment="Left" Margin="335,10,0,0" TextWrapping="Wrap" Text="Study Date" VerticalAlignment="Top" Height="22" Width="120"/>
+        <TextBlock x:Name="StudyDescriptionBlock" HorizontalAlignment="Left" Margin="493,10,0,0" TextWrapping="Wrap" Text="Study Description" VerticalAlignment="Top" Height="22" Width="120"/>
+        <TextBlock x:Name="ModalityBlock" HorizontalAlignment="Left" Margin="651,10,0,0" TextWrapping="Wrap" Text="Modality" VerticalAlignment="Top" Height="22" Width="120"/>
+        <DatePicker Name="StudyDatePicker" HorizontalAlignment="Left" Margin="335,43,0,0" VerticalAlignment="Top"/>
+        <DatePicker Name="PatientBirthDatePicker" HorizontalAlignment="Left" Margin="184,43,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="button1" Content="Search local" HorizontalAlignment="Left" Margin="272,83,0,0" VerticalAlignment="Top" Width="75" Click="onLocalSearchButtonClicked"/>
     </Grid>
 </Page>

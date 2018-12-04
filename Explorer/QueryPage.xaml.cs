@@ -27,9 +27,15 @@ namespace Explorer
             this.mainWindow = mainWindow;
             InitializeComponent();
         }
-        private void onSearchButtonClicked(object sender, RoutedEventArgs e)
+
+        private void onLocalSearchButtonClicked(object sender, RoutedEventArgs e)
         {
-            mainWindow.onSearchButtonClicked(sender,e);
+            mainWindow.onSearchButtonClicked("local");
+        }
+
+        private void onRemoteSearchButtonClicked(object sender, RoutedEventArgs e)
+        {
+            mainWindow.onSearchButtonClicked("remote");
         }
     }
 }

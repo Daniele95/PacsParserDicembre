@@ -14,19 +14,31 @@ namespace PacsParserDicembre
     public class ImageLevelQuery : QueryObject
     {
         public string QueryRetrieveLevel { get; set; } = "IMAGE";
+        public string PatientID { get; set; } = "";
         public string StudyInstanceUID { get; set; } = "";
         public string SeriesInstanceUID { get; set; } = "";
+        public string SOPInstanceUID { get; set; } = "";
         public string InstanceNumber { get; set; } = "";
+
+
+        public ImageLevelQuery() : base()  { }
+
+        public ImageLevelQuery(SeriesLevelQuery seriesQuery) : base()
+        {
+            SetField("StudyInstanceUID", seriesQuery.GetField("StudyInstanceUID"));
+            SetField("SeriesInstanceUID", seriesQuery.GetField("SeriesInstanceUID"));
+            SetField("PatientID", seriesQuery.GetField("PatientID"));
+        }
+
     }
 
-        public class SeriesLevelQuery : QueryObject
+    public class SeriesLevelQuery : QueryObject
     {
         public string QueryRetrieveLevel { get; set; } = "SERIES";
+        public string PatientID { get; set; } = "";
         public string StudyInstanceUID { get; set; } = "";
         public string SeriesInstanceUID { get; set; } = "";
         public string SeriesDescription { get; set; } = "";
-        public string PatientID { get; set; } = "";
-
 
         public SeriesLevelQuery() : base()
         { }
@@ -42,11 +54,11 @@ namespace PacsParserDicembre
     public class StudyLevelQuery : QueryObject
     {
         public string QueryRetrieveLevel { get; set; } = "STUDY";
+        public string PatientID { get; set; } = "";
+        public string StudyInstanceUID { get; set; } = "";
         public string PatientName { get; set; } = "";
         public string PatientBirthDate { get; set; } = "";
-        public string PatientID { get; set; } = "";
         public string Modality { get; set; } = "";
-        public string StudyInstanceUID { get; set; } = "";
         public string StudyDate { get; set; } = "";
         public string AccessionNumber { get; set; } = "";
         public string StudyDescription { get; set; } = "";
@@ -78,7 +90,10 @@ namespace PacsParserDicembre
 
         public string GetField(string tag)
         {
-            return queryData[tag];
+            string ret = queryData[tag];
+          //  try { ret = queryData[tag]; }
+           // catch (Exception exc) { MessageBox.Show("the key "+ tag + " was not present in the database \n" + exc.StackTrace); }
+            return ret;
         }
 
         public void SetField(string tag, string value)
@@ -86,7 +101,7 @@ namespace PacsParserDicembre
             PropertyInfo prop = this.GetType().GetProperty(tag, BindingFlags.Public | BindingFlags.Instance);
 
             if (null != prop && prop.CanWrite)
-                prop.SetValue(this, value, null);
+                prop.SetValue(this, value);
 
             queryData[tag] = value;
         }

@@ -6,37 +6,47 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
+using EvilDICOM;
+using System.Runtime.InteropServices;
+using EvilDICOM.Core.Helpers;
 
 namespace PacsParserDicembre
 {
     public class ExplorerLogic
     {
 
-        public List<QueryObject> searchPatient()
+
+        public List<QueryObject> searchPatient(StudyLevelQuery studyLevelQuery)
         {
-            ImageLevelQuery qu = new ImageLevelQuery();
-            qu.SetField("SeriesInstanceUID", "1.3.6.1.4.1.5962.1.1.0.0.0.1168612284.20369.0.2");
-            qu.SetField("StudyInstanceUID", "1.3.6.1.4.1.5962.1.1.0.0.0.1168612284.20369.0.1");
             QueryService q = new QueryService();
-            List<QueryObject> queryResults = q.LaunchQuery(@"C:\Users\daniele\Desktop\QUERYRESULTS\", qu);
+            return q.LaunchQuery(Constants.queryResults, studyLevelQuery); 
+        }
+
+        public List<QueryObject> searchSeriesOfStudy(StudyLevelQuery studyLevelQuery)
+        {
+            QueryService q = new QueryService();
+            SeriesLevelQuery qu = new SeriesLevelQuery(studyLevelQuery);
+            return q.LaunchQuery(Constants.queryResults, qu);
+        }
+
+        public List<QueryObject> searchImage(SeriesLevelQuery s)
+        {
+            ImageLevelQuery qu = new ImageLevelQuery(s);
+            QueryService q = new QueryService();
+            List<QueryObject> queryResults = q.LaunchQuery(Constants.queryResults, qu);
 
             return queryResults;
 
         }
 
-        public void download()
+        public List<QueryObject> download(QueryObject info, string mode)
         {            
-            SeriesLevelQuery info = new SeriesLevelQuery();
-            info.SetField("StudyInstanceUID", "1.3.6.1.4.1.5962.1.1.0.0.0.1168612284.20369.0.1");
-            info.SetField("SeriesInstanceUID", "1.3.6.1.4.1.5962.1.1.0.0.0.1168612284.20369.0.2");
-            info.SetField("PatientID", "TEST2351267");
-
             DownloadManager d = new DownloadManager(info);
-            List<string> files = d.LaunchQuery();
-
-
-            DicomConvert.ToJpg(files[0]);
-
+            List<QueryObject> files = d.LaunchQuery(mode);            
+            return files;
         }
 
     }

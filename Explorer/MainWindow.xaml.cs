@@ -1,7 +1,11 @@
-﻿using DataHandlerTools;
+﻿using Database;
+using DataHandlerTools;
 using PacsParserDicembre;
+using PacsParserDicembre.Tools;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -19,7 +24,7 @@ namespace Explorer
 {
     public partial class MainWindow : Window
     {
-        
+
 
         QueryPage queryPage;
         DownloadPage downloadPage;
@@ -32,9 +37,10 @@ namespace Explorer
             queryPage = new QueryPage(this);
             downloadPage = new DownloadPage();
             explorerLogic = new ExplorerLogic();
-        }
-        
-        
+            frame.NavigationService.Navigate(queryPage);
+     }
+
+
         void queryClick(object o, RoutedEventArgs e)
         {
             frame.NavigationService.Navigate(queryPage);
@@ -46,64 +52,87 @@ namespace Explorer
 
         // ------------------QUERY WINDOW------------------------------
 
-        public void onSearchButtonClicked(object sender, RoutedEventArgs e)
+        public void onSearchButtonClicked(string mode)
         {
+            
             queryPage.stackPanel.Children.Clear();
-            QueryObject querySettings = new StudyLevelQuery();
-            querySettings.SetField("PatientName", "Doe*");
-            List<QueryObject> results = explorerLogic.searchPatient();
+            StudyLevelQuery querySettings = new StudyLevelQuery();
+
+            querySettings.SetField("PatientName", queryPage.PatientNameBox.Text);
+            querySettings.SetField("PatientBirthDate", queryPage.PatientBirthDatePicker.Text);
+            querySettings.SetField("StudyDate", queryPage.StudyDatePicker.Text);
+            querySettings.SetField("StudyDescription", queryPage.StudyDescriptionBox.Text);
+            querySettings.SetField("Modality", queryPage.ModalityBox.Text);
+
+            List<QueryObject> results = new List<QueryObject>();
+            if (mode== "remote") results = explorerLogic.searchPatient(querySettings);
+
+            List<DownloadedFileInfo> risultati = new List<DownloadedFileInfo>();
+            if (mode == "local") risultati = database.Get(new DownloadedFileInfo(), Constants.database);
+
+            foreach (QueryObject result in results)
+            {
+                Button resultButton = new Button();
+                resultButton.Content = result.GetField("PatientName").Replace('^',' ') + "      " + result.GetField("StudyDescription").Replace('_',' ') + "      " + result.GetField("StudyDate") + "      " + result.GetField("Modality");
+                resultButton.Click += (theSender, eventArgs) => { onStudyButtonClicked(result); };
+                queryPage.stackPanel.Children.Add(resultButton);
+            }
+            
         }
-       
 
-        public void onStudyQueryArrived(QueryObject queryResults)
-        {
-            string resultText = "";
-            resultText = queryResults.GetField("PatientName") + " " + queryResults.GetField("StudyDate") + " " + queryResults.GetField("PatientID") + "\n";
 
-            this.Dispatcher.Invoke(() => {
-
-                Button result = new Button();
-                result.Content = resultText;
-
-                // if button pressed, do a retrieval of the series in that study
-            //    currentStudyToDownload = queryResults;
-                result.Click += (sender, e) => { onStudyButtonClicked(queryResults); };
-
-                queryPage.stackPanel.Children.Add(result);
-            });
-
-        }
 
         // search all series of a study
         public void onStudyButtonClicked(QueryObject queryResults)
         {
             downloadPage.stackPanel.Children.Clear();
             frame.NavigationService.Navigate(downloadPage);
+
+
+            List<QueryObject> results = explorerLogic.searchSeriesOfStudy((StudyLevelQuery)queryResults);
+
+
+            foreach (QueryObject series in results)
+            {
+
+                // query images
+                List<QueryObject> images = explorerLogic.searchImage((SeriesLevelQuery)series);
+                // scarica l'immagine a metà di images.length
+                int imageToDownload = (int)(images.Count / 2.0f);
+
+                List<QueryObject> downloadedFilesInfo = explorerLogic.download(images[imageToDownload], "single");
+                string filePath = Constants.listenerFolder+downloadedFilesInfo[0].GetField("SOPInstanceUID");
+
+                Button resultButton = new Button();
+
+                downloadPage.stackPanel.Children.Add(resultButton);
+                resultButton.Click += (o, e) => {
+                    explorerLogic.download(series, "series");
+                };
+
+                try
+                {
+                    Bitmap img = ImageTools.loadImage(filePath); // + ".dcm"
+
+                    //-------------------------------
+
+                    ImageBrush imgBrush = new ImageBrush();
+
+                    imgBrush.ImageSource = ImageTools.BitmapToImageSource(img);
+                    resultButton.Height = 70;
+                    resultButton.Width = (int)(imgBrush.ImageSource.Width / imgBrush.ImageSource.Height * 70);
+
+                    resultButton.Background = imgBrush;
+                } catch (Exception) {  MessageBox.Show("could not load image");  }
+
+                resultButton.Content = downloadedFilesInfo[0].GetField("SeriesDescription");
+                File.Delete(filePath);
+            }
         }
 
-        // add found series to series list 
-        public void onSeriesQueryArrived(QueryObject queryResults)
+        private void frame_Navigated(object sender, NavigationEventArgs e)
         {
-            Dispatcher.Invoke(() => {
-                Button result = new Button();
-                result.Content = queryResults.GetField("SeriesInstanceUID") + "  " + queryResults.GetField("SeriesDescription");
-                // qui fare una query a livello immagine per ottenere series description e un'immagine rappresentativa
-                result.Click += ((obj, evento) => { onSeriesButtonClicked(queryResults); });
-                downloadPage.stackPanel.Children.Add(result);
-            });
-        }
-
-        // ------------------------------------------------
-
-        public void onSeriesButtonClicked(QueryObject queryResults)
-        {
 
         }
-
-        public void onDownloadArrived(string path)
-        {
-            MessageBox.Show(path);
-        }
-
     }
 }

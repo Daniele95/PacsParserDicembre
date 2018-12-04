@@ -8,8 +8,28 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="DownloadPage">
 
+
     <Grid>
-        <StackPanel Name="stackPanel" HorizontalAlignment="Left" Height="450" VerticalAlignment="Top" Width="800"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Grid.RowSpan="5">
+            <StackPanel Name="stackPanel"></StackPanel>
+        </DockPanel>
 
     </Grid>
+
+
 </Page>

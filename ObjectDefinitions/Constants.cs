@@ -22,6 +22,7 @@ namespace PacsParserDicembre
 
         public static string database = @"C:/Users/daniele/Desktop/DATABASE/";
 
+        public static string queryResults = @"C:\Users\daniele\Desktop\QUERYRESULTS\";
 
         public static string listenerFolder = @"C:/Users/daniele/Lavoro/Dicom/Listener/downloads/";
     }
